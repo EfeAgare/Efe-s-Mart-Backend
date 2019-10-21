@@ -1,4 +1,4 @@
-namespace :db do
+namespace :stored_procedured do
   task :migrate do
     # The logic of importing sql to database
     Dir[Rails.root + "/db/*.sql"].each do |file|
