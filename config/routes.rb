@@ -10,6 +10,7 @@
   scope 'customers' do
     post "/", to: "customer#update_credit_card"
     post "/login", to: "customer#login"
+    post "/signup", to: "customer#create"
   end
 
   scope 'customer' do

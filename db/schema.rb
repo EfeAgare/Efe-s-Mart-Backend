@@ -40,7 +40,7 @@ ActiveRecord::Schema.define(version: 0) do
   create_table "customer", primary_key: "customer_id", id: :integer, options: "ENGINE=MyISAM DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", limit: 50, null: false
     t.string "email", limit: 100, null: false
-    t.string "password", limit: 100, null: false
+    t.string "password_digest", limit: 100, null: false
     t.text "credit_card"
     t.string "address_1", limit: 100
     t.string "address_2", limit: 100

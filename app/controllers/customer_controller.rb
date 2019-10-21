@@ -7,9 +7,27 @@
 # to see our recommended endpoints, request body/param, and response object for each of these method
 
 class CustomerController < ApplicationController
+  skip_before_action :authorize_request, only: :create
   # create a new customer account
   def create
-    json_response({ message: 'NOT IMPLEMENTED' })
+   
+    foundCustomer = Customer.find_by(email: auth_params[:email]);
+
+    if foundCustomer
+       json_response({ error: Message.account_exists }, 409) 
+    else
+      user = Customer.create!(auth_params)
+      auth_token = AuthenticateUser.new(user.name, user.email, user.password).call
+
+      response = {
+        message: Message.login_success,
+        auth_token: auth_token
+      }
+      json_response(response, :created)
+    end
+    
+  rescue ExceptionHandler::ServerError => e
+    json_response({ error: e.message }, 500) 
   end
 
   # login a customer account
@@ -37,5 +55,9 @@ class CustomerController < ApplicationController
   # update a customer credit card
   def update_credit_card
     json_response({ message: 'NOT IMPLEMENTED' })
+  end
+
+  def auth_params
+    params.permit(:name, :email, :password)
   end
 end
