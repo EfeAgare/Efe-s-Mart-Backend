@@ -1,7 +1,4 @@
 class Message
-  def self.records_not_found
-    "Sorry, there are currently no incident reports."
-  end
 
   def self.not_found(record = 'record')
     "Sorry, #{record} not found."
