@@ -126,7 +126,35 @@ class CustomerController < ApplicationController
     json_response({ error: e.message }, :internal_server_error) 
   end
 
- 
+  # update a customer credit card
+  def update_credit_card
+    
+    if @current_user
+      update_params = {
+        credit_card: params[:credit_card].to_i
+      }
+  
+      param = CreditCardModel.new(update_params)
+
+      if !param.valid?
+        json_response(param.errors, :bad_request)
+      else  
+        update_customer_credit_card = StoredProcedureService.new.execute("customer_update_credit_card", "#{@current_user.customer_id},'#{param.credit_card}'")
+
+        
+        binding.pry
+        
+        json_response(update_customer_credit_card[0].to_h, :ok)
+      end
+
+    else
+      raise(ExceptionHandler::BadRequest, ("#{Message.not_found}"))
+    end
+   
+  rescue ExceptionHandler::ServerError => e
+    json_response({ error: e.message }, :internal_server_error) 
+  end
+
  
 
   private
