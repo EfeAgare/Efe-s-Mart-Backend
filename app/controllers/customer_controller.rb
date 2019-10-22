@@ -82,8 +82,6 @@ class CustomerController < ApplicationController
         @current_user.update!(update_params)
         # update_customer_details = StoredProcedureService.new.execute("customer_update_account", "'#{@current_user.customer_id}', '#{param.name}', '#{param.email}', '#{param.password}', '#{param.day_phone}', '#{param.eve_phone}', '#{param.mob_phone}'")
         json_response(@current_user, :ok)
-      
-      # update_customer_details = StoredProcedureService.new.execute("customer_update_account", "'#{update_params[:customer_id]}', '#{update_params[:name]}', '#{update_params[:email]}', '#{update_params[:password_digest]}', '#{update_params[:day_phone]}', '#{update_params[:eve_phone]}', '#{update_params[:mob_phone]}'")
 
     else
       raise(ExceptionHandler::BadRequest, ("#{Message.not_found}"))
@@ -108,6 +106,7 @@ class CustomerController < ApplicationController
         shipping_region_id: params[:shipping_region_id]
       }
 
+      # validation params
       param = Validate::UpdateCustomerProfile.new(update_params)
 
       if !param.valid?
@@ -134,6 +133,7 @@ class CustomerController < ApplicationController
         credit_card: params[:credit_card].to_i
       }
   
+      # validation params
       param = CreditCardModel.new(update_params)
 
       if !param.valid?
@@ -141,9 +141,6 @@ class CustomerController < ApplicationController
       else  
         update_customer_credit_card = StoredProcedureService.new.execute("customer_update_credit_card", "#{@current_user.customer_id},'#{param.credit_card}'")
 
-        
-        binding.pry
-        
         json_response(update_customer_credit_card[0].to_h, :ok)
       end
 
