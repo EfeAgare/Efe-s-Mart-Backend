@@ -93,8 +93,40 @@ class CustomerController < ApplicationController
     json_response({ error: e.message }, :internal_server_error)  
   end
 
-  
+  # update a customer billing info such as
+  # address_1, address_2, city, region, postal_code, country and shipping_region_id
+  def update_customer_address
 
+    if @current_user
+      update_params = {
+        address_1: params[:address_1],
+        address_2: params[:address_2],
+        city: params[:city],
+        region: params[:region],
+        postal_code: params[:postal_code],
+        country: params[:country],
+        shipping_region_id: params[:shipping_region_id]
+      }
+
+      param = Validate::UpdateCustomerProfile.new(update_params)
+
+      if !param.valid?
+        json_response(param.errors, :bad_request)
+      else  
+          update_customer_details = StoredProcedureService.new.execute("customer_update_address", "#{@current_user.customer_id},'#{param.address_1}', '#{param.address_2}', '#{param.city}', '#{param.region}', '#{param.postal_code}', '#{param.country}', #{param.shipping_region_id}")
+        
+        json_response(update_customer_details[0].to_h, :ok)
+      end
+
+    else
+      raise(ExceptionHandler::BadRequest, ("#{Message.not_found}"))
+    end
+   
+  rescue ExceptionHandler::ServerError => e
+    json_response({ error: e.message }, :internal_server_error) 
+  end
+
+ 
  
 
   private
