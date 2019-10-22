@@ -1208,7 +1208,7 @@ END$$
 -- Create customer_get_customer stored procedure
 CREATE PROCEDURE customer_get_customer(IN inCustomerId INT)
 BEGIN
-  SELECT customer_id, name, email, password_digest, credit_card,
+  SELECT customer_id, name, email, credit_card,
          address_1, address_2, city, region, postal_code, country,
          shipping_region_id, day_phone, eve_phone, mob_phone
   FROM   customer
@@ -1226,6 +1226,11 @@ BEGIN
          password_digest = inPassword, day_phone = inDayPhone,
          eve_phone = inEvePhone, mob_phone = inMobPhone
   WHERE  customer_id = inCustomerId;
+  SELECT customer_id, name, email, credit_card,
+         address_1, address_2, city, region, postal_code, country,
+         shipping_region_id, day_phone, eve_phone, mob_phone
+  FROM   customer
+  WHERE  customer_id = inCustomerId;
 END$$
 
 -- Create customer_update_credit_card stored procedure
@@ -1234,6 +1239,11 @@ CREATE PROCEDURE customer_update_credit_card(
 BEGIN
   UPDATE customer
   SET    credit_card = inCreditCard
+  WHERE  customer_id = inCustomerId;
+  SELECT customer_id, name, email, credit_card,
+         address_1, address_2, city, region, postal_code, country,
+         shipping_region_id, day_phone, eve_phone, mob_phone
+  FROM   customer
   WHERE  customer_id = inCustomerId;
 END$$
 
@@ -1254,6 +1264,12 @@ BEGIN
   SET    address_1 = inAddress1, address_2 = inAddress2, city = inCity,
          region = inRegion, postal_code = inPostalCode,
          country = inCountry, shipping_region_id = inShippingRegionId
+  WHERE  customer_id = inCustomerId;
+
+  SELECT customer_id, name, email, credit_card,
+         address_1, address_2, city, region, postal_code, country,
+         shipping_region_id, day_phone, eve_phone, mob_phone
+  FROM   customer
   WHERE  customer_id = inCustomerId;
 END$$
 

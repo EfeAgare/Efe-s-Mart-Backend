@@ -12,7 +12,7 @@ class Customer < ApplicationRecord
 
   validates :password, presence: true, length: { minimum: 6 }, format: { with: VALID_PASSWORD }
 
-
+  
 
   private
 

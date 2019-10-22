@@ -2,6 +2,7 @@
 
 module ExceptionHandler
   extend ActiveSupport::Concern
+  extend ActiveSupport::NumberHelper
 
   class InvalidToken < StandardError; end
   class MissingToken < StandardError; end

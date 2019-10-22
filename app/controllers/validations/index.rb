@@ -1,0 +1,2 @@
+require 'validations/update_customer_address'
+require 'validations/check_card_validation'
