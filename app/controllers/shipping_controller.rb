@@ -15,6 +15,12 @@ class ShippingController < ApplicationController
 
   # get all shipping type for a shipping region
   def get_shipping_type
-    json_response({ message: 'NOT IMPLEMENTED' })
+    shipping_regions_type = Shipping.where("shipping_region_id = ?", params[:shipping_region_id])
+
+    if !shipping_regions_type.blank?
+      json_response(shipping_regions_type)
+    else
+      json_response({message: "shipping type for a shipping region #{params[:shipping_region_id]} not found"}, 404)
+    end
   end
 end
