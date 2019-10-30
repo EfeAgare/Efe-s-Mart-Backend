@@ -60,7 +60,11 @@ class ProductController < ApplicationController
        
     products_by_category = StoredProcedureService.new.execute("catalog_get_products_in_category", "'#{params[:category_id]}','#{params[:description_length]}', '#{params[:limit]}', '#{params[:page]}'")
 
-    json_response({rows: products_by_category })
+    if products_by_category 
+      json_response({rows: products_by_category })
+    else
+      json_response({message: "products in a category not found"}, 404)
+    end
   end
 
   # get all products in a department
@@ -102,6 +106,11 @@ class ProductController < ApplicationController
 
   # get all categories in a department
   def get_department_categories
-    json_response({ message: 'NOT IMPLEMENTED' })
+    category_in_department = Category.where("department_id = ? ", params[:department_id])
+    if category_in_department
+      json_response(category_in_department)
+    else
+      json_response({message: "category in department not found"}, 404)
+    end
   end
 end
