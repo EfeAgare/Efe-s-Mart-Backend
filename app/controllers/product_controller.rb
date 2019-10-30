@@ -44,8 +44,6 @@ class ProductController < ApplicationController
       params[:page] = 1
     end
        
-
-
     search_product = StoredProcedureService.new.execute("catalog_search", "'#{params[:query_string]}','#{params[:all_words]}', '#{params[:description_length]}', '#{params[:limit]}', '#{params[:page]}'")
 
     json_response({rows: search_product.flatten })
@@ -53,7 +51,16 @@ class ProductController < ApplicationController
 
   # get all products in a category
   def get_products_by_category
-    json_response({ message: 'NOT IMPLEMENTED' })
+
+    if !params[:description_length] || !params[:limit] || !params[:page]
+      params[:description_length] = 200
+      params[:limit] = 20
+      params[:page] = 1
+    end
+       
+    products_by_category = StoredProcedureService.new.execute("catalog_get_products_in_category", "'#{params[:category_id]}','#{params[:description_length]}', '#{params[:limit]}', '#{params[:page]}'")
+
+    json_response({rows: products_by_category })
   end
 
   # get all products in a department
