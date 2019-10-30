@@ -26,9 +26,29 @@ class ProductController < ApplicationController
     json_response(products)
   end
 
+
+
   # search all products
   def search_product
-    json_response({ message: 'NOT IMPLEMENTED' })
+    
+    if !params[:query_string]
+      json_response({error: {
+        message: "params cannot be empty"
+      }}, :bad_request)
+    end
+
+    if !params[:all_words]  || !params[:description_length] || !params[:limit] || !params[:page]
+      params[:all_words]  = "on"
+      params[:description_length] = 200
+      params[:limit] = 20
+      params[:page] = 1
+    end
+       
+
+
+    search_product = StoredProcedureService.new.execute("catalog_search", "'#{params[:query_string]}','#{params[:all_words]}', '#{params[:description_length]}', '#{params[:limit]}', '#{params[:page]}'")
+
+    json_response({rows: search_product.flatten })
   end
 
   # get all products in a category
