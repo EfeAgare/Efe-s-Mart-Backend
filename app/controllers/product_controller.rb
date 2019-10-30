@@ -92,7 +92,12 @@ class ProductController < ApplicationController
 
   # get single category details
   def get_category
-    json_response({ message: 'NOT IMPLEMENTED' })
+    category = Category.find(params[:category_id])
+    if category
+      json_response(category)
+    else
+      json_response({message: "category not found"}, 404)
+    end
   end
 
   # get all categories in a department
