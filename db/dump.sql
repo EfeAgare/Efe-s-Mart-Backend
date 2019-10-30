@@ -448,7 +448,7 @@ CREATE PROCEDURE catalog_get_products_on_department(
   IN inProductsPerPage INT, IN inStartItem INT)
 BEGIN
   PREPARE statement FROM
-    "SELECT DISTINCT p.product_id, p.name,
+    "SELECT DISTINCT p.product_id, p.name, p.display,
                      IF(LENGTH(p.description) <= ?,
                         p.description,
                         CONCAT(LEFT(p.description, ?),
@@ -810,6 +810,7 @@ BEGIN
     SELECT -1;
   END IF;
 END$$
+
 
 -- Create catalog_get_category_products stored procedure
 CREATE PROCEDURE catalog_get_category_products(IN inCategoryId INT)
