@@ -9,13 +9,21 @@
 class ProductController < ApplicationController
   # get all products
   def get_all_products
-    products = Product.all();
-    json_response(products)
+    
+    products = Product.page(params[:page]).per(params[:limit]);
+    
+    json_response({ paginationMeta: {
+      currentPage: params[:page].to_i,                # Current page number
+      currentPageSize: params[:limit],        # The page limit
+      totalPages: products.total_pages,               # The total number of pages for all products
+      totalRecord: Product.count,               # The total number of product in the database
+    }, rows: products } )
   end
 
   # get single product details
   def get_product
-    json_response({ message: 'NOT IMPLEMENTED' })
+    products = Product.find(params[:product_id]);
+    json_response(products)
   end
 
   # search all products
