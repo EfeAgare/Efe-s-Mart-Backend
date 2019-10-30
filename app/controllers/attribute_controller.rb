@@ -35,7 +35,13 @@ class AttributeController < ApplicationController
 
   # get all the attributes for a product
   def get_product_attributes
-    json_response({ message: 'NOT IMPLEMENTED' })
+    
+    attribute_value = StoredProcedureService.new.execute("catalog_get_product_attributes", "'#{params[:product_id]}'")
+    if attribute_value
+      json_response(attribute_value)
+    else
+      json_response({message: "Attribute value not found"}, 404)
+    end
   end
 
 end
