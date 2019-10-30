@@ -25,7 +25,12 @@ class AttributeController < ApplicationController
 
   # get all attribute values of a single attribute using the attribute id
   def get_attribute_values
-    json_response({ message: 'NOT IMPLEMENTED' })
+    attribute_value = AttributeValue.where("attribute_id = ? ", params[:attribute_id] )
+    if attribute_value
+      json_response(attribute_value)
+    else
+      json_response({message: "Attribute value not found"}, 404)
+    end
   end
 
   # get all the attributes for a product
