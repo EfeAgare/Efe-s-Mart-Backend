@@ -9,7 +9,8 @@
 class AttributeController < ApplicationController
   # get all attributes
   def get_all_attributes
-    json_response({ message: 'NOT IMPLEMENTED' })
+    attribute = Attribute.all()
+    json_response(attribute)
   end
 
   # get a single attribute using the attribute_id in the request parameter
