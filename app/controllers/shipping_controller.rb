@@ -9,7 +9,8 @@
 class ShippingController < ApplicationController
   # get all shipping regions
   def get_shipping_regions
-    json_response({ message: 'NOT IMPLEMENTED' })
+    shipping_regions = ShippingRegion.all()
+    json_response(shipping_regions)
   end
 
   # get all shipping type for a shipping region
