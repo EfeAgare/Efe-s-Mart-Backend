@@ -86,7 +86,8 @@ class ProductController < ApplicationController
 
   # get all categories
   def get_all_categories
-    json_response({ message: 'NOT IMPLEMENTED' })
+    categories = Category.all()
+    json_response(categories)
   end
 
   # get single category details
