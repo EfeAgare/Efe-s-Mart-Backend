@@ -5,9 +5,8 @@
 #
 # NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION linked in the readme of this repository
 # to see our recommended endpoints, request body/param, and response object for each of these method
- # nice = StoredProcedureService.new.execute("customer_add", "'efe','knoledgeaga145@gmail.com', 'faithe'")
 
- require 'validations/index'
+require 'validations/index'
 class CustomerController < ApplicationController
   before_action :check_if_exist, only: [:create, :login]
   skip_before_action :authorize_request, only: [:create, :login]
@@ -80,7 +79,8 @@ class CustomerController < ApplicationController
       }
           
         @current_user.update!(update_params)
-        # update_customer_details = StoredProcedureService.new.execute("customer_update_account", "'#{@current_user.customer_id}', '#{param.name}', '#{param.email}', '#{param.password}', '#{param.day_phone}', '#{param.eve_phone}', '#{param.mob_phone}'")
+        @current_user[:password_digest] = ''
+ 
         json_response(@current_user, :ok)
 
     else
