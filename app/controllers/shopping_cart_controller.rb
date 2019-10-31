@@ -39,7 +39,20 @@ class ShoppingCartController < ApplicationController
 
   # update quantity of an item in a shopping cart
   def update_cart_item
-    json_response({ message: 'NOT IMPLEMENTED' })
+    if params[:quantity].is_a? Integer
+      update_cart = ShoppingCart.where("cart_id = ? AND item_id = ? ", session[:cart_id], params[:item_id])
+      if update_cart
+        update_cart.update(quantity: params[:quantity])
+        json_response(update_cart)
+
+      else
+        json_response({ message: "cart with #{params[:item_id]} does not exit" }, 404)
+      end
+
+    else
+      json_response({ message: 'quantity must be an integer' }, 422)
+    end
+      
   end
 
   # remove all items from a shopping cart
