@@ -16,7 +16,7 @@ class ShoppingCartController < ApplicationController
   # add item to existing cart with cart id
   def add_item_to_cart
     
-    if params[:cart_id] == session[:cart_id]
+    if params[:cart_id] == session[:cart_id] && params[:cart_id].to_i == @current_user.customer_id
 
       add_to_cart =  StoredProcedureService.new.execute("shopping_cart_add_product", "'#{session[:cart_id]}','#{params[:product_id]}', '#{params[:attribute_value]}'")
   
@@ -28,7 +28,13 @@ class ShoppingCartController < ApplicationController
 
   # get all items in a shopping cart using cart id
   def get_cart
-    json_response({ message: 'NOT IMPLEMENTED' })
+    if params[:cart_id] == session[:cart_id] && params[:cart_id].to_i == @current_user.customer_id
+      get_items_in_cart =  StoredProcedureService.new.execute("shopping_cart_get_products", "'#{session[:cart_id]}'")
+
+      json_response(get_items_in_cart)
+    else
+      json_response({message: "cart does not exit"}, 404)
+    end
   end
 
   # update quantity of an item in a shopping cart
