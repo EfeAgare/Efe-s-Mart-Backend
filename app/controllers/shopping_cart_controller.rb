@@ -7,6 +7,7 @@
 # to see our recommended endpoints, request body/param, and response object for each of these method
 
 class ShoppingCartController < ApplicationController
+  before_action :set_cart
   # generate random unique id for cart identifier
   def generate_unique_cart
     json_response({ message: 'NOT IMPLEMENTED' })
@@ -55,5 +56,14 @@ class ShoppingCartController < ApplicationController
   # checkout order and process stripe payment
   def process_stripe_payment
     json_response({ message: 'NOT IMPLEMENTED' })
+  end
+
+
+  private 
+
+  def set_cart
+    @cart = ShoppingCart.find(session[:cart_id])
+  rescue ActiveRecord::RecordNotFound
+    session[:cart_id] = @current_user.customer_id
   end
 end
