@@ -130,4 +130,42 @@ class ProductController < ApplicationController
       json_response({message: "category in department not found"}, 404)
     end
   end
+
+  # get product details
+  def get_product_details
+    
+  end
+
+  # get product location
+  def get_product_location
+    
+  end
+
+  # create product review
+  def create_product_reviews
+    
+    if !params[:product_id].to_i || !params[:review] || !params[:rating].to_i
+      json_response({message: "params cannot be empty"}, 404)
+    else
+      review = Review.new(review_params)
+
+      if review.save
+        json_response(review)
+      else
+        json_response({message: "An error occur"}, 500)
+      end
+    end
+  end
+
+  # get product review 
+  def get_product_reviews
+  
+  end
+
+
+  private
+
+  def review_params
+    params.permit(:product_id, :review, :rating)
+  end
 end
