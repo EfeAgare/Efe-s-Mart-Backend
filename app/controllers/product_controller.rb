@@ -143,13 +143,17 @@ class ProductController < ApplicationController
 
   # create product review
   def create_product_reviews
-    
-    if !params[:product_id].to_i || !params[:review] || !params[:rating].to_i
+
+    if !params[:product_id] || !params[:review] || !params[:rating]
       json_response({message: "params cannot be empty"}, 404)
     else
-      review = Review.new(review_params)
+      review = Review.new({ product_id: params[:product_id].to_i,
+                            review: params[:review],
+                            rating: params[:rating].to_i,
+                            customer_id: @current_user.customer_id
+                            })
 
-      if review.save
+      if review.save!
         json_response(review)
       else
         json_response({message: "An error occur"}, 500)
