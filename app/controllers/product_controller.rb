@@ -163,7 +163,13 @@ class ProductController < ApplicationController
 
   # get product review 
   def get_product_reviews
-  
+    product_reviews = Review.where("product_id = ? ",params[:product_id])
+
+    if !product_reviews.blank?
+      json_response(product_reviews)
+    else
+      json_response({message: "No reviews for this product"}, 404)
+    end
   end
 
 
