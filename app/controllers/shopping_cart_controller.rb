@@ -10,7 +10,7 @@ class ShoppingCartController < ApplicationController
   before_action :set_cart
   # generate random unique id for cart identifier
   def generate_unique_cart
-    json_response({ message: 'NOT IMPLEMENTED' })
+    json_response({unigue_id: session[:cart_id]})
   end
 
   # add item to existing cart with cart id
@@ -64,6 +64,6 @@ class ShoppingCartController < ApplicationController
   def set_cart
     @cart = ShoppingCart.find(session[:cart_id])
   rescue ActiveRecord::RecordNotFound
-    session[:cart_id] = @current_user.customer_id
+    session[:cart_id] = @current_user.customer_id.to_s
   end
 end
