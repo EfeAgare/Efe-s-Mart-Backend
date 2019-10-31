@@ -994,21 +994,27 @@ BEGIN
   FROM   shopping_cart
   WHERE  cart_id = inCartId
          AND product_id = inProductId
-         AND attributes = inAttributes
+         AND attribute_value = inAttributes
   INTO   productQuantity;
 
   -- Create new shopping cart record, or increase quantity of existing record
   IF productQuantity IS NULL THEN
-    INSERT INTO shopping_cart(item_id, cart_id, product_id, attributes,
+    INSERT INTO shopping_cart(item_id, cart_id, product_id, attribute_value,
                               quantity, added_on)
            VALUES (UUID(), inCartId, inProductId, inAttributes, 1, NOW());
   ELSE
+    SET @LastUpdateID := 0;
     UPDATE shopping_cart
-    SET    quantity = quantity + 1, buy_now = true
+    SET    quantity = quantity + 1, buy_now = true, item_id = (SELECT @LastUpdateID := item_id)
     WHERE  cart_id = inCartId
            AND product_id = inProductId
-           AND attributes = inAttributes;
+           AND attribute_value = inAttributes;
   END IF;
+  IF (SELECT LAST_INSERT_ID())=0 THEN
+    select * from shopping_cart where item_id=(SELECT @LastUpdateID);
+   else
+     select * from shopping_cart where item_id=(SELECT LAST_INSERT_ID());
+   END IF;
 END$$
 
 -- Create shopping_cart_update_product stored procedure
@@ -1032,7 +1038,7 @@ END$$
 -- Create shopping_cart_get_products stored procedure
 CREATE PROCEDURE shopping_cart_get_products(IN inCartId CHAR(32))
 BEGIN
-  SELECT     sc.item_id, p.name, sc.attributes,
+  SELECT     sc.item_id, p.name, sc.attribute_value,
              COALESCE(NULLIF(p.discounted_price, 0), p.price) AS price,
              sc.quantity,
              COALESCE(NULLIF(p.discounted_price, 0),
@@ -1046,7 +1052,7 @@ END$$
 -- Create shopping_cart_get_saved_products stored procedure
 CREATE PROCEDURE shopping_cart_get_saved_products(IN inCartId CHAR(32))
 BEGIN
-  SELECT     sc.item_id, p.name, sc.attributes,
+  SELECT     sc.item_id, p.name, sc.attribute_value,
              COALESCE(NULLIF(p.discounted_price, 0), p.price) AS price
   FROM       shopping_cart sc
   INNER JOIN product p

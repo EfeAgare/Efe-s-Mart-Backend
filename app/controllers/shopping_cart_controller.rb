@@ -10,12 +10,20 @@ class ShoppingCartController < ApplicationController
   before_action :set_cart
   # generate random unique id for cart identifier
   def generate_unique_cart
-    json_response({unigue_id: session[:cart_id]})
+    json_response({cart_id: session[:cart_id]})
   end
 
   # add item to existing cart with cart id
   def add_item_to_cart
-    json_response({ message: 'NOT IMPLEMENTED' })
+    
+    if params[:cart_id] == session[:cart_id]
+
+      add_to_cart =  StoredProcedureService.new.execute("shopping_cart_add_product", "'#{session[:cart_id]}','#{params[:product_id]}', '#{params[:attribute_value]}'")
+  
+      json_response(add_to_cart)
+    else
+      json_response({message: "server error"}, 500)
+    end
   end
 
   # get all items in a shopping cart using cart id
