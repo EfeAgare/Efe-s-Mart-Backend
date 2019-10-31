@@ -6,4 +6,5 @@ class Review < ApplicationRecord
   validates :customer_id, presence: true
   
   
+  validates :rating, inclusion: { in:  [0, 1, 2, 3, 4, 5], message: "invalid rating" }
 end
