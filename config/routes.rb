@@ -61,6 +61,7 @@
     post "/", to: "shopping_cart#create_order"
     get "/inCustomer", to: "shopping_cart#get_customer_orders"
     get "/:order_id", to: "shopping_cart#get_order_summary"
+    get "/: /orders/shortDetail/:order_id", to: "shopping_cart#get_order_summary"
   end
 
   post "/stripe/charge", to: "shopping_cart#process_stripe_payment"
