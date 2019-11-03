@@ -94,7 +94,12 @@ class ShoppingCartController < ApplicationController
 
   # get all orders placed by a customer
   def get_customer_orders
-    json_response({ message: 'NOT IMPLEMENTED' })
+      customer_orders =  StoredProcedureService.new.execute("orders_get_by_customer_id", "'#{@current_user.customer_id}'")
+      if  customer_orders
+        json_response(customer_orders)
+      else
+        json_response({message: "Orders does not exit"}, 404)
+      end
   end
 
   # get details of items in an order
