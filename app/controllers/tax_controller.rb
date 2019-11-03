@@ -9,7 +9,8 @@
 class TaxController < ApplicationController
   # get all tax types
   def get_all_tax
-    json_response({ message: 'NOT IMPLEMENTED' })
+    all_tax = Tax.all()
+    json_response(all_tax)
   end
   # get a single tax type using tax id
   def get_single_tax
