@@ -61,6 +61,7 @@ class ShoppingCartController < ApplicationController
       destroy_cart = ShoppingCart.where("cart_id = ?", params[:cart_id])
       if destroy_cart
         destroy_cart.destroy_all
+        session[:cart_id] = nil
         json_response([])
       else
         json_response({ message: "cart not found" }, 404)
@@ -83,7 +84,12 @@ class ShoppingCartController < ApplicationController
 
   # create order for all items in a shopping cart
   def create_order
-    json_response({ message: 'NOT IMPLEMENTED' })
+    if params[:cart_id] == session[:cart_id] && params[:cart_id].to_i == @current_user.customer_id
+      create_order =  StoredProcedureService.new.execute("shopping_cart_create_order", "'#{params[:cart_id]}', '#{params[:shipping_id]}', '#{params[:tax_id]}'")
+      json_response(create_order)
+    else
+      json_response({message: "cart does not exit"}, 404)
+    end
   end
 
   # get all orders placed by a customer
