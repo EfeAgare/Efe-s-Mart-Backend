@@ -104,7 +104,12 @@ class ShoppingCartController < ApplicationController
 
   # get details of items in an order
   def get_order_summary
-    json_response({ message: 'NOT IMPLEMENTED' })
+    customer_orders =  StoredProcedureService.new.execute("orders_get_order_details", "'#{params[:order_id]}'")
+    if  customer_orders
+      json_response(customer_orders)
+    else
+      json_response({message: "Orders does not exit"}, 404)
+    end
   end
 
   # checkout order and process stripe payment
