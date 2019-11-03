@@ -14,6 +14,15 @@ class TaxController < ApplicationController
   end
   # get a single tax type using tax id
   def get_single_tax
-    json_response({ message: 'NOT IMPLEMENTED' })
+    if params[:tax_id].to_i > 0
+      single_tax = Tax.where("tax_id = ?", params[:tax_id])
+      if single_tax
+        json_response(single_tax)
+      else
+        json_response({ message: "#{params[:tax_id]} not found" }, 404)
+      end
+    else
+      json_response({ message: "#{params[:tax_id]} is invalid" }, 422)
+    end
   end
 end
