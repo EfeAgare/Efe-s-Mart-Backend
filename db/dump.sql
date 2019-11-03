@@ -70,7 +70,7 @@ CREATE TABLE `shopping_cart` (
   `item_id`     INT           NOT NULL  AUTO_INCREMENT,
   `cart_id`     CHAR(32)      NOT NULL,
   `product_id`  INT           NOT NULL,
-  `attributes`  VARCHAR(1000) NOT NULL,
+  `attribute_value`  VARCHAR(1000) NOT NULL,
   `quantity`    INT           NOT NULL,
   `buy_now`     BOOL          NOT NULL  DEFAULT true,
   `added_on`    DATETIME      NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE `order_detail` (
   `item_id`      INT           NOT NULL  AUTO_INCREMENT,
   `order_id`     INT           NOT NULL,
   `product_id`   INT           NOT NULL,
-  `attributes`   VARCHAR(1000) NOT NULL,
+  `attribute_value`   VARCHAR(1000) NOT NULL,
   `product_name` VARCHAR(100)  NOT NULL,
   `quantity`     INT           NOT NULL,
   `unit_cost`    DECIMAL(10,2) NOT NULL,
@@ -1130,7 +1130,7 @@ END$$
 -- Create orders_get_order_details stored procedure
 CREATE PROCEDURE orders_get_order_details(IN inOrderId INT)
 BEGIN
-  SELECT order_id, product_id, attributes, product_name,
+  SELECT order_id, product_id, attribute_value, product_name,
          quantity, unit_cost, (quantity * unit_cost) AS subtotal
   FROM   order_detail
   WHERE  order_id = inOrderId;
@@ -1364,9 +1364,9 @@ BEGIN
   SELECT LAST_INSERT_ID() INTO orderId;
 
   -- Insert order details in order_detail table
-  INSERT INTO order_detail (order_id, product_id, attributes,
+  INSERT INTO order_detail (order_id, product_id, attribute_value,
                             product_name, quantity, unit_cost)
-  SELECT      orderId, p.product_id, sc.attributes, p.name, sc.quantity,
+  SELECT      orderId, p.product_id, sc.attribute_value, p.name, sc.quantity,
               COALESCE(NULLIF(p.discounted_price, 0), p.price) AS unit_cost
   FROM        shopping_cart sc
   INNER JOIN  product p

@@ -84,8 +84,8 @@ class ShoppingCartController < ApplicationController
 
   # create order for all items in a shopping cart
   def create_order
-    if params[:cart_id] == session[:cart_id] && params[:cart_id].to_i == @current_user.customer_id
-      create_order =  StoredProcedureService.new.execute("shopping_cart_create_order", "'#{params[:cart_id]}', '#{params[:shipping_id]}', '#{params[:tax_id]}'")
+    if params[:cart_id] == session[:cart_id].to_i && params[:cart_id] == @current_user.customer_id
+      create_order =  StoredProcedureService.new.execute("shopping_cart_create_order", "'#{params[:cart_id]}', '#{@current_user.customer_id}','#{params[:shipping_id]}', '#{params[:tax_id]}'")
       json_response(create_order)
     else
       json_response({message: "cart does not exit"}, 404)
