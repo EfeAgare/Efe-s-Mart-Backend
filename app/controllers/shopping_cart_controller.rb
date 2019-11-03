@@ -57,7 +57,17 @@ class ShoppingCartController < ApplicationController
 
   # remove all items from a shopping cart
   def empty_cart
-    json_response({ message: 'NOT IMPLEMENTED' })
+    if params[:cart_id] == session[:cart_id] && params[:cart_id] == @current_user.customer_id.to_s
+      destroy_cart = ShoppingCart.where("cart_id = ?", params[:cart_id])
+      if destroy_cart
+        destroy_cart.destroy_all
+        json_response([])
+      else
+        json_response({ message: "cart not found" }, 404)
+      end
+    else
+      json_response({ message: "Not Authorize" }, 409)
+    end
   end
 
   # remove a specific item from a shopping cart
