@@ -102,11 +102,22 @@ class ShoppingCartController < ApplicationController
       end
   end
 
+
   # get details of items in an order
   def get_order_summary
-    customer_orders =  StoredProcedureService.new.execute("orders_get_order_details", "'#{params[:order_id]}'")
-    if  customer_orders
-      json_response(customer_orders)
+    customer_orders_summary =  StoredProcedureService.new.execute("orders_get_order_details", "'#{params[:order_id]}'")
+    if  customer_orders_summary
+      json_response(customer_orders_summary)
+    else
+      json_response({message: "Orders does not exit"}, 404)
+    end
+  end
+
+  # get details of items in an order
+  def get_short_order_summary
+    customer_orders_summary =  StoredProcedureService.new.execute("orders_get_order_short_details", "'#{params[:order_id]}'")
+    if  customer_orders_summary
+      json_response(customer_orders_summary)
     else
       json_response({message: "Orders does not exit"}, 404)
     end
