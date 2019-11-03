@@ -13,5 +13,10 @@ class ApplicationController < ActionController::API
 
   def authorize_request
     @current_user = (AuthorizeApiRequest.new(request.headers).call)[:user]
+    if @current_user
+      return @current_user
+    else
+      return json_response({ message: 'You need to login/register' })
+    end
   end
 end

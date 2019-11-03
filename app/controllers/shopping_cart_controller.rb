@@ -62,7 +62,13 @@ class ShoppingCartController < ApplicationController
 
   # remove a specific item from a shopping cart
   def remove_item_from_cart
-    json_response({ message: 'NOT IMPLEMENTED' })
+    cart = ShoppingCart.find(params[:item_id])
+    if cart
+      cart.destroy(params[:item_id])
+      json_response({ message: "#{params[:item_id]} remove successfully" })
+    else
+      json_response({ message: "#{params[:item_id]} not found" }, 404)
+    end
   end
 
   # create order for all items in a shopping cart
