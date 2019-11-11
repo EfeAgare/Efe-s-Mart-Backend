@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :customer do
+    order
     name { "knowledge" }
     email { "efe.love@gmail.com"}
     password 
