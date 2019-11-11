@@ -5,6 +5,7 @@
 #
 # NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION linked in the readme of this repository
 # to see our recommended endpoints, request body/param, and response object for each of these method
+require 'stripe'
 
 class ShoppingCartController < ApplicationController
   before_action :set_cart
