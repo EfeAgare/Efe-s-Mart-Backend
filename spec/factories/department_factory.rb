@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :department do
-    name "favour" 
+    name {"favour"} 
     description { " "}
   end
 end

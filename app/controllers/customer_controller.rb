@@ -58,6 +58,7 @@ class CustomerController < ApplicationController
      response = {
        auth_token: @current_user
      }
+     
      json_response(response, :ok)
   
   rescue ExceptionHandler::ServerError => e
