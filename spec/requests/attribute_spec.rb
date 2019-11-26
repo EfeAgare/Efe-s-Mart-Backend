@@ -20,6 +20,15 @@ RSpec.describe AttributeController, type: :request do
     end
     
 
-    
+    # get a single attribute using the attribute_id in the request parameter
+    context 'GET get a single attribute' do
+      before { get "/attributes/1", headers: headers}
+      it 'should get a single attributes' do
+        expect(response).to  have_http_status(200)
+        expect(json).to_not be_nil
+      end
+    end
+
+
   end
 end
