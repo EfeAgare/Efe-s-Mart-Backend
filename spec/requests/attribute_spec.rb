@@ -29,6 +29,16 @@ RSpec.describe AttributeController, type: :request do
       end
     end
 
+      # get all attribute values of a single attribute using the attribute id
+
+      context 'GET all attribute values of a single attribute using the attribute id' do
+        before { get "/attributes/values/1", headers: headers}
+        it 'should get all attribute values of a single attribute using the attribute id' do
+          expect(response).to  have_http_status(200)
+          expect(json).to_not be_nil
+        end
+      end
+
 
   end
 end
