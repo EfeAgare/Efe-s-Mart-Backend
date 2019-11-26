@@ -40,5 +40,13 @@ RSpec.describe AttributeController, type: :request do
       end
 
 
+        # get all the attributes for a product
+      context 'GET all the attributes for a product' do
+        before { get "/attributes/inProduct/1", headers: headers}
+        it 'should get all the attributes for a product' do
+          expect(response).to  have_http_status(200)
+          expect(json).to_not be_nil
+        end
+      end
   end
 end
