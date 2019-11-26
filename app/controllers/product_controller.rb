@@ -154,7 +154,7 @@ class ProductController < ApplicationController
                             })
 
       if review.save!
-        json_response(review)
+        json_response(review, 201)
       else
         json_response({message: "An error occur"}, 500)
       end

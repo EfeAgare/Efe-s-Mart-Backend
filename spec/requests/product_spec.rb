@@ -15,6 +15,14 @@ RSpec.describe ProductController, type: :request do
       "all_words": "on"
    }
   end
+
+  let(:review) do {
+    "product_id": 1,
+    "review":"I love the product",
+    "rating": "4"
+   }
+  end
+
   after(:each) do
     user.destroy
   end
@@ -74,6 +82,27 @@ RSpec.describe ProductController, type: :request do
          expect(json).to_not be_nil  
       end
     end
+
+
+    # create product review 
+    context 'create product review' do
+     
+      before { post "/products/1/reviews", params: review.to_json, headers: headers } 
+      it 'should create review for a product' do
+        expect(response).to  have_http_status(201)
+        expect(json).to_not be_nil  
+      end
+    end
+
+      # get product review 
+      context 'get product review' do
+     
+        before { get "/products/1/reviews", headers: headers } 
+        it 'should get all product review' do
+          expect(response).to  have_http_status(200)
+          expect(json).to_not be_nil  
+        end
+      end
 
   end
 end
