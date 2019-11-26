@@ -117,4 +117,33 @@ RSpec.describe CustomerController, type: :request do
         end
       end
     end
+
+
+     # update a customer credit card
+
+     describe 'PUT update customer credit' do
+      before do
+        @credit_card = {
+          credit_card: "5274576394259961"
+        }
+        @invalid_credit_card = {
+          credit_card: "5274 5763 9425 0000"
+        }
+      end
+      context 'update_customer_credit_card' do
+        before { put '/customer/creditCard', params: @credit_card.to_json, headers: headers }
+        it 'returns user updated billing info' do
+          expect(response).to have_http_status(200)
+          expect(json["credit_card"]).to eq @credit_card[:credit_card]
+        end
+      end
+
+      context 'should throw an error when updating_customer_credit_card ' do
+        before { put '/customer/creditCard', params: @invalid_credit_card.to_json, headers: headers }
+        it 'returns error' do
+          expect(response).to have_http_status(400)
+        end
+      end
+    end
+
 end

@@ -168,3 +168,9 @@ class CustomerController < ApplicationController
 end
 
 
+
+# '5274 5763 9425 9961'.credit_card_brand   #=> :mastercard
+#     '5274 5763 9425 9961'.credit_card_brand_name   #=> "MasterCard"
+#     '5274 5763 9425 9961'.valid_credit_card_brand?(:mastercard, :visa) #=> true
+#     '5274 5763 9425 9961'.valid_credit_card_brand?(:amex) #=> false
+#     '5274 5763 9425 9961'.valid_credit_card_brand?('MasterCard') #=> true
