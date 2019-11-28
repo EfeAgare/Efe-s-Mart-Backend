@@ -67,7 +67,7 @@ CREATE TABLE `product_attribute` (
 
 -- Create shopping_cart table
 CREATE TABLE `shopping_cart` (
-  `item_id`     INT           NOT NULL  AUTO_INCREMENT,
+  `item_id`     VARCHAR(100)  NOT NULL  AUTO_INCREMENT,
   `cart_id`     CHAR(32)      NOT NULL,
   `product_id`  INT           NOT NULL,
   `attribute_value`  VARCHAR(1000) NOT NULL,
@@ -1422,6 +1422,12 @@ END$$
 CREATE PROCEDURE orders_update_status(IN inOrderId INT, IN inStatus INT)
 BEGIN
   UPDATE orders SET status = inStatus WHERE order_id = inOrderId;
+  SELECT      o.order_id, o.total_amount, o.created_on,
+              o.shipped_on, o.status, c.name
+  FROM        orders o
+  INNER JOIN  customer c
+                ON o.customer_id = c.customer_id
+  WHERE       o.order_id = inOrderId;
 END$$
 
 -- Create orders_set_auth_code stored procedure
