@@ -126,26 +126,21 @@ class ShoppingCartController < ApplicationController
 
   # checkout order and process stripe payment
   def process_stripe_payment
-    stripe_checks
-    begin
-      
-        customer = Stripe::Customer.create({
-          email: @current_user.email,
-          source: params[:stripeToken],
-        })
-      
-        ## Creates the actual charges by calling our API.
-        @charge = Stripe::Charge.create({
-          customer: customer.id,
-          amount: @customer_order_summary.map(&:total_amount).reduce(:+).to_i * 100,
-          description: "Charge for #{params[:email]}",
-          currency: 'usd',
-        })
-      if (@charge.paid)
-        update_order_status
-        json_response(@charge, 201)
-        return
-      end
+   
+    begin 
+        if (params[:order_id].blank?)
+          return json_response({message: "params cannot be empty"}, 400)
+        else
+          @customer_order_summary =  StoredProcedureService.new.execute("orders_get_order_short_details", "'#{params[:order_id]}'")
+
+          if (@customer_order_summary[0].status == 1)
+            return json_response({
+              message: 'Payment has been made for this order',
+            }, 409)
+          else
+            stripe_payment
+          end
+        end
     rescue Stripe::CardError => e
       json_response({ message: e.message,  status: e.http_status, TYPE: e.error.type, ChargeID: e.error.charge })
     end
@@ -160,23 +155,24 @@ class ShoppingCartController < ApplicationController
     session[:cart_id] = @current_user.customer_id.to_s
   end
 
-  def stripe_checks
-
-    if (!params[:email] || !params[:stripeToken] || !params[:order_id])
-      json_response({message: "params cannot be empty"}, 400)
-      return
-    end
-    @customer_order_summary =  StoredProcedureService.new.execute("orders_get_order_short_details", "'#{params[:order_id]}'")
-
-    if (@customer_order_summary.map(&:status) == 1)
-      json_response({
-        message: 'Payment has been made for this order',
-      }, status: 409)
-      return
+  def stripe_payment
+      customer = Stripe::Customer.create({
+        email: @current_user.email,
+        source: params[:stripeToken],
+      })
+    
+      ## Creates the actual charges by calling our API.
+      @charge = Stripe::Charge.create({
+        customer: customer.id,
+        amount: @customer_order_summary.map(&:total_amount).reduce(:+).to_i * 100,
+        description: "Charge for #{params[:email]}",
+        currency: 'usd',
+      })
+    if (@charge.paid)
+      @customer_orders = StoredProcedureService.new.execute("orders_update_status", "'#{params[:order_id]}', '#{1}'")
+      json_response(@charge, 201)
+      
     end
   end
 
-  def update_order_status
-    @customer_orders = StoredProcedureService.new.execute("orders_update_status", "'#{params[:order_id]}', '#{1}'")
-  end
 end
