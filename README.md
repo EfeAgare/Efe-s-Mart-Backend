@@ -1,10 +1,5 @@
-# Turing Back End Challenge
+# Back End
 
-To complete this challenge, you need to ensure all route returns a similar response object as described in our API guide.
-To achieve this goal
-
-- You will have to fix the existing bugs
-- Implement the incomplete functions,
 - Add test cases for the main functions of the system.
 - Use Dockerfile to the root of the project to run the app in docker environment
 
