@@ -47,5 +47,5 @@ In order to install and run this project locally, you would need to have the fol
 
 ## Request and Response Object API guide for all Endpoints
 
-- Check [here](https://docs.google.com/document/d/1J12z1vPo8S5VEmcHGNejjJBOcqmPrr6RSQNdL58qJyE/edit?usp=sharing)
+- Check [here](https://docs.google.com/document/d/1hsTE92Syq-t1WYu8RYOIIXdmBFx4Cx7T2ymVWI7VTjI/edit?usp=sharing)
 - Visit `http://127.0.0.1:8000`
