@@ -67,10 +67,10 @@ CREATE TABLE `product_attribute` (
 
 -- Create shopping_cart table
 CREATE TABLE `shopping_cart` (
-  `item_id`     VARCHAR(100)  NOT NULL  AUTO_INCREMENT,
+  `item_id`     INT           NOT NULL  AUTO_INCREMENT,
   `cart_id`     CHAR(32)      NOT NULL,
   `product_id`  INT           NOT NULL,
-  `attribute_value`  VARCHAR(1000) NOT NULL,
+  `attributes`  VARCHAR(1000) NOT NULL,
   `quantity`    INT           NOT NULL,
   `buy_now`     BOOL          NOT NULL  DEFAULT true,
   `added_on`    DATETIME      NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE `order_detail` (
   `item_id`      INT           NOT NULL  AUTO_INCREMENT,
   `order_id`     INT           NOT NULL,
   `product_id`   INT           NOT NULL,
-  `attribute_value`   VARCHAR(1000) NOT NULL,
+  `attributes`   VARCHAR(1000) NOT NULL,
   `product_name` VARCHAR(100)  NOT NULL,
   `quantity`     INT           NOT NULL,
   `unit_cost`    DECIMAL(10,2) NOT NULL,
@@ -415,7 +415,6 @@ BEGIN
     INNER JOIN product_category pc
                  ON p.product_id = pc.product_id
     WHERE      pc.category_id = ?
-    ORDER BY   p.display DESC
     LIMIT      ?, ?";
 
   -- Define query parameters
@@ -448,12 +447,12 @@ CREATE PROCEDURE catalog_get_products_on_department(
   IN inProductsPerPage INT, IN inStartItem INT)
 BEGIN
   PREPARE statement FROM
-    "SELECT DISTINCT p.product_id, p.name, p.display,
+    "SELECT DISTINCT p.product_id, p.name,
                      IF(LENGTH(p.description) <= ?,
                         p.description,
                         CONCAT(LEFT(p.description, ?),
                                '...')) AS description,
-                     p.price, p.discounted_price, p.thumbnail
+                     p.price, p.discounted_price, p.thumbnail, p.display
      FROM            product p
      INNER JOIN      product_category pc
                        ON p.product_id = pc.product_id
@@ -461,7 +460,6 @@ BEGIN
                        ON pc.category_id = c.category_id
      WHERE           (p.display = 2 OR p.display = 3)
                      AND c.department_id = ?
-     ORDER BY        p.display DESC
      LIMIT           ?, ?";
 
   SET @p1 = inShortProductDescriptionLength;
@@ -811,7 +809,6 @@ BEGIN
   END IF;
 END$$
 
-
 -- Create catalog_get_category_products stored procedure
 CREATE PROCEDURE catalog_get_category_products(IN inCategoryId INT)
 BEGIN
@@ -994,27 +991,21 @@ BEGIN
   FROM   shopping_cart
   WHERE  cart_id = inCartId
          AND product_id = inProductId
-         AND attribute_value = inAttributes
+         AND attributes = inAttributes
   INTO   productQuantity;
 
   -- Create new shopping cart record, or increase quantity of existing record
   IF productQuantity IS NULL THEN
-    INSERT INTO shopping_cart(item_id, cart_id, product_id, attribute_value,
+    INSERT INTO shopping_cart(item_id, cart_id, product_id, attributes,
                               quantity, added_on)
            VALUES (UUID(), inCartId, inProductId, inAttributes, 1, NOW());
   ELSE
-    SET @LastUpdateID := 0;
     UPDATE shopping_cart
-    SET    quantity = quantity + 1, buy_now = true, item_id = (SELECT @LastUpdateID := item_id)
+    SET    quantity = quantity + 1, buy_now = true
     WHERE  cart_id = inCartId
            AND product_id = inProductId
-           AND attribute_value = inAttributes;
+           AND attributes = inAttributes;
   END IF;
-  IF (SELECT LAST_INSERT_ID())=0 THEN
-    select * from shopping_cart where item_id=(SELECT @LastUpdateID);
-   else
-     select * from shopping_cart where item_id=(SELECT LAST_INSERT_ID());
-   END IF;
 END$$
 
 -- Create shopping_cart_update_product stored procedure
@@ -1038,7 +1029,7 @@ END$$
 -- Create shopping_cart_get_products stored procedure
 CREATE PROCEDURE shopping_cart_get_products(IN inCartId CHAR(32))
 BEGIN
-  SELECT     sc.item_id, p.name, sc.attribute_value,
+  SELECT     sc.item_id, p.name, sc.attributes,
              COALESCE(NULLIF(p.discounted_price, 0), p.price) AS price,
              sc.quantity,
              COALESCE(NULLIF(p.discounted_price, 0),
@@ -1052,7 +1043,7 @@ END$$
 -- Create shopping_cart_get_saved_products stored procedure
 CREATE PROCEDURE shopping_cart_get_saved_products(IN inCartId CHAR(32))
 BEGIN
-  SELECT     sc.item_id, p.name, sc.attribute_value,
+  SELECT     sc.item_id, p.name, sc.attributes,
              COALESCE(NULLIF(p.discounted_price, 0), p.price) AS price
   FROM       shopping_cart sc
   INNER JOIN product p
@@ -1130,7 +1121,7 @@ END$$
 -- Create orders_get_order_details stored procedure
 CREATE PROCEDURE orders_get_order_details(IN inOrderId INT)
 BEGIN
-  SELECT order_id, product_id, attribute_value, product_name,
+  SELECT order_id, product_id, attributes, product_name,
          quantity, unit_cost, (quantity * unit_cost) AS subtotal
   FROM   order_detail
   WHERE  order_id = inOrderId;
@@ -1215,7 +1206,7 @@ END$$
 -- Create customer_get_customer stored procedure
 CREATE PROCEDURE customer_get_customer(IN inCustomerId INT)
 BEGIN
-  SELECT customer_id, name, email, credit_card,
+  SELECT customer_id, name, email, password_digest, credit_card,
          address_1, address_2, city, region, postal_code, country,
          shipping_region_id, day_phone, eve_phone, mob_phone
   FROM   customer
@@ -1233,11 +1224,6 @@ BEGIN
          password_digest = inPassword, day_phone = inDayPhone,
          eve_phone = inEvePhone, mob_phone = inMobPhone
   WHERE  customer_id = inCustomerId;
-  SELECT customer_id, name, email, credit_card,
-         address_1, address_2, city, region, postal_code, country,
-         shipping_region_id, day_phone, eve_phone, mob_phone
-  FROM   customer
-  WHERE  customer_id = inCustomerId;
 END$$
 
 -- Create customer_update_credit_card stored procedure
@@ -1246,11 +1232,6 @@ CREATE PROCEDURE customer_update_credit_card(
 BEGIN
   UPDATE customer
   SET    credit_card = inCreditCard
-  WHERE  customer_id = inCustomerId;
-  SELECT customer_id, name, email, credit_card,
-         address_1, address_2, city, region, postal_code, country,
-         shipping_region_id, day_phone, eve_phone, mob_phone
-  FROM   customer
   WHERE  customer_id = inCustomerId;
 END$$
 
@@ -1271,12 +1252,6 @@ BEGIN
   SET    address_1 = inAddress1, address_2 = inAddress2, city = inCity,
          region = inRegion, postal_code = inPostalCode,
          country = inCountry, shipping_region_id = inShippingRegionId
-  WHERE  customer_id = inCustomerId;
-
-  SELECT customer_id, name, email, credit_card,
-         address_1, address_2, city, region, postal_code, country,
-         shipping_region_id, day_phone, eve_phone, mob_phone
-  FROM   customer
   WHERE  customer_id = inCustomerId;
 END$$
 
@@ -1364,9 +1339,9 @@ BEGIN
   SELECT LAST_INSERT_ID() INTO orderId;
 
   -- Insert order details in order_detail table
-  INSERT INTO order_detail (order_id, product_id, attribute_value,
+  INSERT INTO order_detail (order_id, product_id, attributes,
                             product_name, quantity, unit_cost)
-  SELECT      orderId, p.product_id, sc.attribute_value, p.name, sc.quantity,
+  SELECT      orderId, p.product_id, sc.attributes, p.name, sc.quantity,
               COALESCE(NULLIF(p.discounted_price, 0), p.price) AS unit_cost
   FROM        shopping_cart sc
   INNER JOIN  product p
@@ -1422,12 +1397,6 @@ END$$
 CREATE PROCEDURE orders_update_status(IN inOrderId INT, IN inStatus INT)
 BEGIN
   UPDATE orders SET status = inStatus WHERE order_id = inOrderId;
-  SELECT      o.order_id, o.total_amount, o.created_on,
-              o.shipped_on, o.status, c.name
-  FROM        orders o
-  INNER JOIN  customer c
-                ON o.customer_id = c.customer_id
-  WHERE       o.order_id = inOrderId;
 END$$
 
 -- Create orders_set_auth_code stored procedure
