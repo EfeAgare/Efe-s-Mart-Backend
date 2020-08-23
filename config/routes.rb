@@ -24,7 +24,7 @@
     get "/", to: "product#get_all_products"
     get "/search", to: "product#search_product"
     get "/:product_id/details", to: "product#get_product_details"
-    get "/::product_id/locations", to: "product#get_product_location"
+    get "/:product_id/locations", to: "product#get_product_location"
     post "/:product_id/reviews", to: "product#create_product_reviews"
     get "/:product_id/reviews", to: "product#get_product_reviews"
     get "/:product_id", to: "product#get_product"
