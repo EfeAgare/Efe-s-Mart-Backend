@@ -1,11 +1,3 @@
-# The controller defined below is the customer controller,
-#
-#  Some methods are stubbed out for you to implement them from scratch
-# while others may contain one or two bugs
-#
-# NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION linked in the readme of this repository
-# to see our recommended endpoints, request body/param, and response object for each of these method
-
 require 'validations/index'
 class CustomerController < ApplicationController
   before_action :check_if_exist, only: [:create, :login]
@@ -14,11 +6,12 @@ class CustomerController < ApplicationController
 
   # create a new customer account
   def create
-  
+    binding.pry
     if @foundCustomer
        json_response({ error: Message.account_exists }, 409) 
     else
       user = Customer.create!(auth_params)
+
       auth_token = AuthenticateUser.new(user.name, user.email, user.password).call
 
       response = {
@@ -54,7 +47,7 @@ class CustomerController < ApplicationController
 
   # get the logged in customer profile
   def get_customer_profile
-
+binding.pry
      response = {
        auth_token: @current_user
      }

@@ -1,12 +1,5 @@
-# The controller defined below is the product controller,
-#
-#  Some methods are stubbed out for you to implement them from scratch
-# while others may contain one or two bugs
-#
-# NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION linked in the readme of this repository
-# to see our recommended endpoints, request body/param, and response object for each of these method
-
 class ProductController < ApplicationController
+  skip_before_action  :authorize_request
   # get all products
   def get_all_products
     
@@ -18,7 +11,7 @@ class ProductController < ApplicationController
         currentPageSize: params[:limit],        # The page limit
         totalPages: products.total_pages,               # The total number of pages for all products
         totalRecord: Product.count,               # The total number of product in the database
-      }, rows: products } )
+      }, count: Product.count, rows: products } )
     else
       json_response({message: "Products not found"}, 404)
     end
@@ -79,9 +72,10 @@ class ProductController < ApplicationController
       params[:limit] = 20
       params[:page] = 1
     end
-       
+
     products_by_department = StoredProcedureService.new.execute("catalog_get_products_on_department", "'#{params[:department_id]}','#{params[:description_length]}', '#{params[:limit]}', '#{params[:page]}'")
 
+   
     if !products_by_department.blank?
       json_response({rows: products_by_department })
     else
@@ -133,12 +127,30 @@ class ProductController < ApplicationController
 
   # get product details
   def get_product_details
-    
+    product_details  = Product.find(params[:product_id])
+
+    if !product_details.blank?
+      json_response({rows: product_details} )
+    else
+      json_response({message: "products details not found"}, 404)
+    end
+
   end
 
   # get product location
   def get_product_location
-    
+    product_location = StoredProcedureService.new.execute("catalog_get_product_locations", "'#{params[:product_id]}'")
+
+    if !product_location.blank?
+      json_response({rows: {"category_id": product_location[0].category_id,
+        "category_name": product_location[0].category_name,
+        "department_id": product_location[0].department_id,
+        "department_name": product_location[0].department_name }
+         })
+    else
+      json_response({message: "products location not found"}, 404)
+    end
+
   end
 
   # create product review

@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
   before_action :authorize_request
 
   def welcome
-    json_response({ message: 'Welcome to Turing E-commerce shop api, your goal is to implement the missing code or fix the bugs inside this project' })
+    json_response({ message: "Welcome to  Efe's Mart shop api" })
   end
 
   private
